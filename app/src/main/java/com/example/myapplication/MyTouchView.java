@@ -4,7 +4,9 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -24,8 +26,11 @@ import io.reactivex.functions.Consumer;
 
 
 /**
- * Created by huangb on 2017/3/3.
- * 放IOS touch
+ * 
+ * Description
+ * Author puyantao
+ * Email 1067899750@qq.com
+ * Date 2019/5/31 13:36
  */
 
 @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
@@ -46,7 +51,7 @@ public class MyTouchView extends View {
     /**
      * 按下的位置
      */
-    private float mDowny;
+    private float mDownY;
 
     /**
      * 最小移动距离
@@ -166,10 +171,12 @@ public class MyTouchView extends View {
             mScreenHeight = ScreenUtils.getScreenHeight();
             mMiniMove = ViewConfiguration.get(getContext()).getScaledTouchSlop();
             Parent_HEIGHT = mScreenHeight - BarUtils.getStatusBarHeight(getContext());
+            int weight = getMeasuredWidth();
+            int height = getMeasuredHeight();
             if (isNomalAddress) {
-                setX(mScreenWhite - getMeasuredWidth() / 2 - POSITON);
-//                setY(Parent_HEIGHT - BOTTOM_POSITION - getMeasuredHeight());
-                setY(Parent_HEIGHT/2  - getMeasuredHeight() / 2);
+                setX(mScreenWhite - weight/ 2 - POSITON);
+                setY(Parent_HEIGHT - BOTTOM_POSITION - height/2);
+//                setY(Parent_HEIGHT/2  - height / 2);
             } else {
                 setX(mInitX);
                 setY(mInitY);
@@ -202,34 +209,41 @@ public class MyTouchView extends View {
                     }
                     if (isOnSide) {
                         mDownX = event.getRawX();
-                        mDowny = event.getRawY();
+                        mDownY = event.getRawY();
+                        Log.d("---> x:y ", mDownX + " : " + mDownY);
                     }
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
                 //x最小移动距离
-                if ((Math.abs(event.getRawX() - mDownX) > mMiniMove) || (Math.abs(event.getRawY() - mDowny) > mMiniMove)
+                float moveX = event.getRawX();
+                float moveY = event.getRawY();
+                if ((Math.abs(moveX - mDownX) > mMiniMove) || (Math.abs(moveY- mDownY) > mMiniMove)
                         && !isOnAnmition
-                        && (event.getRawY() < Parent_HEIGHT + getMeasuredHeight() - POSITON - VIRTUALBARHEIGHT - 20)) {
+                        && (moveY < Parent_HEIGHT + getMeasuredHeight() - POSITON - VIRTUALBARHEIGHT - 20)) {
                     if (mTouchLogoClickListener != null)
                         mTouchLogoClickListener.OnViewMove(event);
                     isMove = true;
-                    if (event.getRawY() <= mScreenHeight) {
+                    if (moveY <= mScreenHeight) {
                         //防止超出屏幕
-                        if (event.getRawX() >= getMeasuredWidth() / 2 && event.getRawX() <= mScreenWhite - getMeasuredWidth() / 2) {
-                            setX(event.getRawX() - getMeasuredWidth() / 2);
-                            mLastX = event.getRawX();
+                        if (moveX >= getMeasuredWidth() / 2 && moveX <= mScreenWhite - getMeasuredWidth() / 2) {
+                            setX(getX() + (moveX - mDownX));
+                            mLastX = moveX;
                         }
-                        setY(event.getRawY() - getMeasuredHeight() / 2);
+                        setY(getY() + (moveY - mDownY));
                     }
+                    mDownY = moveY;
+                    mDownX = moveX;
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                float upX = event.getRawX();
+                float upY = event.getRawY();
                 if (!isOnAnmition) {
                     /**
                      *点击
                      */
-                    if ((Math.abs(event.getRawX() - mDownX) <= mMiniMove) && !isTimeOut && isOnSide && !isMove) {
+                    if ((Math.abs(upX - mDownX) <= mMiniMove) && !isTimeOut && isOnSide && !isMove) {
 //                        if (isShow) {
 //                            isShow = false;
 //                            setScaleAnimotion();
@@ -242,7 +256,7 @@ public class MyTouchView extends View {
                             return true;
                         }
                         if (mTouchLogoClickListener != null)
-                            mTouchLogoClickListener.onTouchClick(event.getRawX(), event.getRawY());
+                            mTouchLogoClickListener.onTouchClick(upX, upY);
                         /**
                          *移动
                          */
@@ -251,10 +265,10 @@ public class MyTouchView extends View {
                             mTouchLogoClickListener.onMove();
                         isMove = false;
                         isOnSide = false;
-                        if (event.getRawX() > mScreenWhite / 2) {
-                            setMoveAnimotion(event.getRawX(), mScreenWhite - getMeasuredWidth() - POSITON + getMeasuredWidth() / 2, false);
+                        if (upX > mScreenWhite / 2) {
+                            setMoveAnimotion(upX, mScreenWhite - getMeasuredWidth() - POSITON + getMeasuredWidth() / 2, false);
                         } else {
-                            setMoveAnimotion(event.getRawX(), POSITON + getMeasuredWidth() / 2, false);
+                            setMoveAnimotion(upX, POSITON + getMeasuredWidth() / 2, false);
                         }
                         startTime();
                     }
@@ -265,7 +279,7 @@ public class MyTouchView extends View {
     }
 
     /**
-     * 設置移動外面動畫
+     * 设置移动外面动画
      */
     private void setMoveOutAnimotion() {
         isOnAnmition = true;
@@ -307,22 +321,22 @@ public class MyTouchView extends View {
 
 
     /**
-     * 設置移動動畫
+     * 设置移动结束动画
      */
     private void setMoveAnimotion(final float fromX, float toX, final boolean isOver) {
         isOnAnmition = true;
         float mMoveY = 0;
         /**
-         * 如果超過底部
+         * 如果超出底部
          */
         if (getY() > Parent_HEIGHT - getMeasuredHeight() - BOTTOM_POSITION - VIRTUALBARHEIGHT) {
             mMoveY = Parent_HEIGHT - getY() - BOTTOM_POSITION - getMeasuredHeight() - VIRTUALBARHEIGHT;
         }
         /**
-         * 如果超過頂部
+         * 如果超出顶部
          */
         if (getY() - BOTTOM_POSITION < 0) {
-            mMoveY = -getY() + BOTTOM_POSITION;
+            mMoveY = -getY() + BOTTOM_POSITION - getMeasuredHeight();
         }
 
         if (isOver) {
@@ -356,7 +370,7 @@ public class MyTouchView extends View {
                 }
                 //顶部
                 if (getY() - BOTTOM_POSITION < 0) {
-                    setY(BOTTOM_POSITION);
+                    setY(BOTTOM_POSITION  - getMeasuredHeight());
                 }
                 isOnSide = true;
                 isOnAnmition = false;

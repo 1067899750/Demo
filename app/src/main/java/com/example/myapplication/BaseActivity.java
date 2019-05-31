@@ -11,9 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.myapplication.widget.ScreenUtils;
-import com.example.myapplication.widget.Titlebar;
-import com.example.myapplication.widget.ViewUtil;
 import io.reactivex.disposables.CompositeDisposable;
 
 
@@ -24,15 +21,11 @@ import io.reactivex.disposables.CompositeDisposable;
  * @create 2019/5/31 11:27
  */
 public abstract class BaseActivity extends AppCompatActivity {
-    protected Titlebar titleBar;
     protected LinearLayout baseLayout;
     protected Activity context;
-    protected String token;
     protected MyLinearLayout basetouch;
-    protected String className;
+
     protected CompositeDisposable mCompositeDisposable;
-    protected final int mScreenWidth = ScreenUtils.getScreenWidth();
-    protected final int mScreenHeight = ScreenUtils.getScreenHeight();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +33,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (null != savedInstanceState)
             savedInstanceState = null;
         super.onCreate(savedInstanceState);
+        setContentView(initLayout());
         context = this;
         MyApplication.addActivity(this);
-        className = getClass().getName();
 
         setBaseView();
         initView();
@@ -92,9 +85,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
-
+    protected abstract int initLayout();
     protected abstract void initView();
-
     protected abstract void fillData();
 
     public void setBaseView() {
@@ -129,10 +121,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void setContentView(int layoutResID) {
-        ViewUtil.buildView(layoutResID, baseLayout);
-    }
 
     @Override
     public void finish() {

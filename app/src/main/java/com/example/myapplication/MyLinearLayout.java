@@ -31,7 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by huangb on 2018/4/6.
+ * 
+ * Description
+ * Author puyantao
+ * Email 1067899750@qq.com
+ * Date 2019/5/31 13:47
  */
 
 public class MyLinearLayout extends FrameLayout {
@@ -68,7 +72,7 @@ public class MyLinearLayout extends FrameLayout {
         myTouchView.addOnTouchLogoClicklistener(new MyTouchView.OnTouchLogoClickListener() {
             @Override
             public void onTouchClick(float v, float v1) {
-                if (!TimeUtils.isCanClick()) {
+                if (!TimeUtils.isCanClick()) { //设置连续点击不触发
                     return;
                 }
                 myTouchView.bringToFront();
@@ -153,7 +157,7 @@ public class MyLinearLayout extends FrameLayout {
             ObjectAnimator objectAnimatorY = ObjectAnimator.ofFloat(mImageList.get(isLeft ? i : index - i), "translationY", myTouchView.getY(), point.y);
 
             AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.setDuration(230);
+            animatorSet.setDuration(100);
             animatorSet.play(objectAnimatorX).with(animatorOpen).with(objectAnimatorY).with(objectAnimatorA);
             animatorSet.start();
             animatorSet.addListener(new AnimatorListenerAdapter() {
@@ -209,7 +213,7 @@ public class MyLinearLayout extends FrameLayout {
             ObjectAnimator objectAnimatorX = ObjectAnimator.ofFloat(mImageList.get(isLeft ? i : index - i), "translationX", point.x, myTouchView.getX());
             ObjectAnimator objectAnimatorY = ObjectAnimator.ofFloat(mImageList.get(isLeft ? i : index - i), "translationY", point.y, myTouchView.getY());
             AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.setDuration(230);
+            animatorSet.setDuration(100);
             animatorSet.play(objectAnimatorX).with(animatorClose).with(objectAnimatorY).with(objectAnimatorA);
             animatorSet.start();
             animatorSet.addListener(new AnimatorListenerAdapter() {
@@ -277,7 +281,7 @@ public class MyLinearLayout extends FrameLayout {
                 mView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (!TimeUtils.isCanClick()) {
+                        if (!TimeUtils.isCanClick()) { //设置连续点击不触发
                             return;
                         }
                         if (isShowCir) {
