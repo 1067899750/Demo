@@ -1,10 +1,15 @@
 package com.example.myapplication;
+
+import android.view.View;
+import android.widget.Toast;
+
+import com.example.myapplication.flow.FloatViewManager;
+
 /**
  *
- * Description
- * Author puyantao
- * Email 1067899750@qq.com
- * Date 2019/5/31 14:39
+ * @description
+ * @author puyantao
+ * @date 2020/9/21 9:55
  */
 public class MainActivity extends BaseActivity {
 
@@ -21,6 +26,14 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void fillData() {
-
+        FloatViewManager.getInstance().init(this);
+        FloatViewManager.getInstance().attach(this);
+        FloatViewManager.getInstance().show();
+        FloatViewManager.getInstance().setListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this,"点击", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
